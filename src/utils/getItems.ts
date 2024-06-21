@@ -1,6 +1,5 @@
-import { Item } from "../components/ItemList";
 import database from "../data/item.json";
-import { getRandomNumber } from "./getRandom";
+import { getRandomNumber } from "./getRandoms";
 
 const basicItemsId: string[] = [
   "1038",
@@ -168,9 +167,40 @@ const legendaryItemsId: string[] = [
   "6620",
   "3011",
 ];
+const allItemsId: string[] = [
+  ...basicItemsId,
+  ...epicItemsId,
+  ...legendaryItemsId,
+];
 
-const allItemsId = basicItemsId.concat(epicItemsId, legendaryItemsId);
-type ItemCategory = "basics" | "epics" | "legendaries" | "all";
+export interface Item {
+  id: string;
+  name: string;
+  description: string;
+  colloq: string;
+  plaintext: string;
+  image: {
+    full: string;
+    sprite: string;
+    group: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+  gold: {
+    base: number;
+    purchasable: boolean;
+    total: number;
+    sell: number;
+  };
+  tags: string[];
+  maps?: any;
+  stats?: any;
+  into?: string[];
+  from?: string[];
+}
+export type ItemCategory = "all" | "basics" | "epics" | "legendaries";
 
 const getAllItems = () => {
   const items = Object.values(database.data);
@@ -185,7 +215,7 @@ const getAllItems = () => {
   return itemsList;
 };
 
-export const getItemsByType = (itemCategory: ItemCategory) => {
+export const getItemsByType = (itemCategory: ItemCategory): Item[] => {
   const itemsList = getAllItems();
 
   if (itemCategory === "basics") {
@@ -213,7 +243,7 @@ export const getItemsByType = (itemCategory: ItemCategory) => {
     return allItems;
   }
 
-  return;
+  return [];
 };
 
 export const getItemById = (id: string): Item => {
@@ -242,7 +272,6 @@ export const getRandomItemByType = (itemCategory: ItemCategory) => {
     const sortedId = legendaryItemsIdCopy[randomId];
     const sortedItem = itemsList?.find((item) => item.id === sortedId);
     recycleItemsSorted(randomId, legendaryItemsIdCopy);
-    console.log(sortedItem);
     return sortedItem;
   }
   return;

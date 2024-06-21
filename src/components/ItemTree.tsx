@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { getRandomItemByType } from "../utils/getItems";
-import { Item } from "./ItemList";
+import { Item, getRandomItemByType } from "../utils/getItems";
 import ItemRecipe from "./ItemRecipe";
 
 type ItemStatus = "invalid" | "valid" | "almost";
@@ -44,9 +43,7 @@ function ItemTree() {
   //     },
   //   ],
   // };
-
   const [item, setItem] = useState<Item>();
-
   return (
     <div className="w-[600] flex flex-col justify-between px-6 py-8 rounded-e-lg bg-zinc-800/80">
       <p className="text-lg font-semibold text-white">
@@ -55,7 +52,7 @@ function ItemTree() {
       <ItemRecipe item={item!!} />
       <button
         onClick={() => {
-          setItem(getRandomItemByType("legendaries")!!);
+          setItem(getRandomItemByType("legendaries"));
         }}
         className="w-fulll px-4 py-3 bg-blue-500 rounded"
       >
