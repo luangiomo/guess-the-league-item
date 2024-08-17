@@ -1,4 +1,5 @@
 import database from "../data/item.json";
+import { ItemStructure } from "../hooks/useItemStructure";
 import { getRandomNumber } from "./getRandoms";
 
 const basicItemsId: string[] = [
@@ -92,7 +93,6 @@ const legendaryItemsId: string[] = [
   "3102",
   "3156",
   "3161",
-  "3172",
   "4633",
   "6610",
   "6672",
@@ -151,7 +151,6 @@ const legendaryItemsId: string[] = [
   "3110",
   "6695",
   "3119",
-  "3121",
   "3107",
   "3222",
   "3504",
@@ -200,6 +199,7 @@ export interface Item {
   into?: string[];
   from?: string[];
 }
+
 export type ItemCategory = "all" | "basics" | "epics" | "legendaries";
 
 const getAllItems = () => {
@@ -211,43 +211,37 @@ const getAllItems = () => {
   for (const index in items) {
     itemsList.push(Object.assign(items[index], { id: itemsId[index] }));
   }
-
   return itemsList;
 };
 
-export const getItemsByType = (itemCategory: ItemCategory): Item[] => {
+export const getItemsByCategory = (itemCategory: ItemCategory): Item[] => {
   const itemsList = getAllItems();
+  let category: string[] = [];
 
-  if (itemCategory === "basics") {
-    const basicItems: Item[] = itemsList.filter((key) =>
-      basicItemsId.includes(key.id)
-    );
-    return basicItems;
+  switch (itemCategory) {
+    case "all":
+      category = allItemsId;
+      break;
+    case "basics":
+      category = basicItemsId;
+      break;
+    case "epics":
+      category = epicItemsId;
+      break;
+    case "legendaries":
+      category = legendaryItemsId;
+      break;
+    default:
+      category = [];
+      break;
   }
 
-  if (itemCategory === "epics") {
-    const epicItems: Item[] = itemsList.filter((key) =>
-      epicItemsId.includes(key.id)
-    );
-    return epicItems;
-  }
-
-  if (itemCategory === "legendaries") {
-    const legendaryItems: Item[] = itemsList.filter((key) =>
-      legendaryItemsId.includes(key.id)
-    );
-    return legendaryItems;
-  }
-  if (itemCategory === "all") {
-    const allItems = itemsList.filter((key) => allItemsId.includes(key.id));
-    return allItems;
-  }
-
-  return [];
+  const items: Item[] = itemsList.filter((key) => category.includes(key.id));
+  return items;
 };
 
 export const getItemById = (id: string): Item => {
-  return getItemsByType("all")?.find((item) => item.id == id)!!;
+  return getItemsByCategory("all")?.find((item) => item.id == id)!!;
 };
 
 const sortedItems: string[] = [];
@@ -256,7 +250,7 @@ const legendaryItemsIdCopy = [...legendaryItemsId];
 const recycleItemsSorted = (sortedId: number, list: string[]) => {
   const removedItem = list?.splice(sortedId, 1)[0];
 
-  if (sortedItems.length >= 25) {
+  if (sortedItems.length >= 10) {
     const returnedItem = sortedItems.shift();
     legendaryItemsIdCopy.push(returnedItem!!);
     sortedItems.push(removedItem);
@@ -265,14 +259,60 @@ const recycleItemsSorted = (sortedId: number, list: string[]) => {
   }
 };
 
-export const getRandomItemByType = (itemCategory: ItemCategory) => {
+export const getRandomItem = (): Item => {
+  const randomId = getRandomNumber(legendaryItemsIdCopy.length);
+  const itemsList = getItemsByCategory("legendaries");
+  const sortedId = legendaryItemsIdCopy[randomId];
+  const sortedItem = itemsList.find((item) => item.id === sortedId);
+  recycleItemsSorted(randomId, legendaryItemsIdCopy);
+  return sortedItem!!;
+};
+
+export const getRandomItemByCategory = (itemCategory: ItemCategory) => {
   if (itemCategory === "legendaries") {
     const randomId = getRandomNumber(legendaryItemsIdCopy.length);
-    const itemsList = getItemsByType(itemCategory);
+    const itemsList = getItemsByCategory(itemCategory);
     const sortedId = legendaryItemsIdCopy[randomId];
     const sortedItem = itemsList?.find((item) => item.id === sortedId);
     recycleItemsSorted(randomId, legendaryItemsIdCopy);
-    return sortedItem;
+    return sortedId;
   }
-  return;
+};
+
+type Status = "pending" | "valid" | "invalid" | "partial";
+
+export const getItemToStructure = (itemId: string) => {
+  const { id, from } = getItemById(itemId);
+  const DEFAULT_STATUS: Status = "pending";
+
+  const object: ItemStructure = {
+    id: "0",
+    itemId: id,
+    status: DEFAULT_STATUS,
+    from: [],
+  };
+  if (from != undefined && from?.length > 0) {
+    console.log("entrei", id, from);
+    from?.map((f, index) => {
+      const objectChild: ItemStructure = {
+        id: (index + 1).toString(),
+        itemId: f,
+        status: DEFAULT_STATUS,
+        from: [],
+      };
+      const childFrom = getItemById(f).from;
+      if (childFrom != undefined && childFrom.length > 0)
+        childFrom.map((c, index) => {
+          const objectGrandchild: ItemStructure = {
+            id: (objectChild.id + (index + 1)).toString(),
+            itemId: c,
+            status: DEFAULT_STATUS,
+          };
+          objectChild.from?.push(objectGrandchild);
+        });
+      object.from?.push(objectChild);
+    });
+    return object;
+  }
+  return object;
 };
