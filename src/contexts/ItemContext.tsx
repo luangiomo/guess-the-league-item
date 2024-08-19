@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useState } from "react";
-import { ItemStructure } from "../hooks/useItemStructure";
+import { ItemStructure } from "../utils/getItems";
 
 type ItemContextType = {
   selectedItem: string;

@@ -1,15 +1,5 @@
 import { useEffect, useState } from "react";
-import { getItemById, Item } from "../utils/getItems";
-
-export interface ItemStructure {
-  id: string;
-  itemId: string;
-  name?: string;
-  status: Status;
-  from?: ItemStructure[];
-}
-
-type Status = "pending" | "valid" | "invalid" | "almost";
+import { getItemById, Item, ItemStructure, Status } from "../utils/getItems";
 
 export function useItemStructure(itemId: string) {
   const [itemStructure, setItemStructure] = useState<ItemStructure>();

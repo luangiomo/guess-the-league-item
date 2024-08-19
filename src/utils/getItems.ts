@@ -1,5 +1,4 @@
 import database from "../data/item.json";
-import { ItemStructure } from "../hooks/useItemStructure";
 import { getRandomNumber } from "./getRandoms";
 
 const basicItemsId: string[] = [
@@ -279,7 +278,16 @@ export const getRandomItemByCategory = (itemCategory: ItemCategory) => {
   }
 };
 
-type Status = "pending" | "valid" | "invalid" | "partial";
+export interface ItemStructure {
+  id: string;
+  itemId: string;
+  name?: string;
+  newItemId?: string;
+  status: Status;
+  from?: ItemStructure[];
+}
+
+export type Status = "pending" | "valid" | "invalid" | "partial";
 
 export const getItemToStructure = (itemId: string) => {
   const { id, from } = getItemById(itemId);
@@ -297,6 +305,7 @@ export const getItemToStructure = (itemId: string) => {
       const objectChild: ItemStructure = {
         id: (index + 1).toString(),
         itemId: f,
+        newItemId: undefined,
         status: DEFAULT_STATUS,
         from: [],
       };
@@ -306,6 +315,7 @@ export const getItemToStructure = (itemId: string) => {
           const objectGrandchild: ItemStructure = {
             id: (objectChild.id + (index + 1)).toString(),
             itemId: c,
+            newItemId: undefined,
             status: DEFAULT_STATUS,
           };
           objectChild.from?.push(objectGrandchild);

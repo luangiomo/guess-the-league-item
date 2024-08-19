@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ItemContext } from "../contexts/ItemContext";
 import { getImageUrl } from "../utils/getImageUrl";
 import { getItemToStructure, getRandomItemByCategory } from "../utils/getItems";
@@ -39,11 +39,23 @@ function ItemRecipe() {
                 <img
                   key={item.name + child?.itemId + getRandomId(4)}
                   onClick={() => console.log(child.itemId)}
-                  onDrop={() =>
-                    console.log(selectedItem, child.itemId, child.id)
-                  }
+                  onDrop={() => {
+                    setItem({
+                      ...item,
+                      from: item.from?.map((f) =>
+                        f.id === child.id
+                          ? { ...f, newItemId: selectedItem }
+                          : f
+                      ),
+                    });
+                    console.log(selectedItem, child.itemId, child.id);
+                  }}
                   onDragOver={(e) => e.preventDefault()}
-                  className="overflow-hidden h-12 w-12 border-2 border-zinc-700"
+                  className={`overflow-hidden h-12 w-12 border-2 ${
+                    child.status == "valid"
+                      ? "border-green-500"
+                      : "border-zinc-700"
+                  }`}
                   src={getImageUrl(child?.itemId + ".png")}
                   alt={child?.name}
                 />
@@ -75,16 +87,21 @@ function ItemRecipe() {
                         <img
                           key={item.name + grandchild?.itemId + getRandomId(4)}
                           onDrop={() => {
-                            selectedItem === grandchild.itemId
-                              ? (grandchild.status = "valid")
-                              : (grandchild.status = "invalid");
-
-                            console.log(
-                              selectedItem,
-                              grandchild.itemId,
-                              grandchild.id,
-                              grandchild.status
-                            );
+                            setItem({
+                              ...item,
+                              from: item.from?.map((f) =>
+                                f.id === grandchild.id[0]
+                                  ? {
+                                      ...f,
+                                      from: f.from?.map((f) =>
+                                        f.id === grandchild.id
+                                          ? { ...f, newItemId: selectedItem }
+                                          : f
+                                      ),
+                                    }
+                                  : f
+                              ),
+                            });
                           }}
                           onDragOver={(e) => e.preventDefault()}
                           className={`overflow-hidden h-10 w-10 border-2 ${
