@@ -9,7 +9,7 @@ interface Props {
 }
 
 function ItemList({ category, showTitle }: Props) {
-  const { setSelectedItem } = useContext(ItemContext);
+  const { selectedItem, setSelectedItem } = useContext(ItemContext);
 
   let title: string;
   let items: Item[];
@@ -47,10 +47,13 @@ function ItemList({ category, showTitle }: Props) {
       <ul className="grid grid-cols-8 gap-1.5">
         {items.map((item) => (
           <li
-            draggable
             key={item.id}
+            draggable
             onDragStart={() => {
-              setSelectedItem(item.id);
+              setSelectedItem(item.id), console.log(selectedItem);
+            }}
+            onDragEnd={() => {
+              setSelectedItem(""), console.log(selectedItem);
             }}
           >
             <ItemPicture item={item} />

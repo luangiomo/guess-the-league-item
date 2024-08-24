@@ -1,4 +1,4 @@
-import { getImageUrl } from "../utils/getImageUrl";
+import { getImageByUrl } from "../utils/getImageUrl";
 import { Item } from "../utils/getItems";
 
 interface Props {
@@ -32,7 +32,7 @@ function ItemPicture({ item, size }: Props) {
     <div
       className={`overflow-hidden border border-black cursor-grab w-10 ${dimension}`}
     >
-      <img src={getImageUrl(item.image.full)} />
+      <img src={getImageByUrl(item.image.full)} />
     </div>
   );
 }

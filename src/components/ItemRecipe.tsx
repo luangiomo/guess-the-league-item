@@ -1,92 +1,125 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { ItemContext } from "../contexts/ItemContext";
-import { getImageUrl } from "../utils/getImageUrl";
+import { getImageByUrl } from "../utils/getImageUrl";
 import { getItemToStructure, getRandomItemByCategory } from "../utils/getItems";
 import { getRandomId } from "../utils/getRandoms";
 
 function ItemRecipe() {
-  const { selectedItem, item, setItem } = useContext(ItemContext);
+  const { selectedItem, setSelectedItem, item, setItem } =
+    useContext(ItemContext);
 
-  useEffect(() => {
-    setItem(getItemToStructure(getRandomItemByCategory("legendaries")!!));
+  useLayoutEffect(() => {
+    const selectedItem = getRandomItemByCategory("legendaries");
+    if (selectedItem != undefined) {
+      const itemStructure = getItemToStructure(selectedItem);
+      setItem(itemStructure);
+    }
   }, []);
 
   return (
-    <div className="flex flex-col">
+    <div>
       <div className="flex flex-col items-center">
         <img
-          className="overflow-hidden h-14 w-14 border-2 border-zinc-700"
-          src={getImageUrl(item?.itemId + ".png")}
-          onClick={() => console.log(item)}
+          className="h-14 w-14 border-2 border-zinc-700"
+          src={getImageByUrl(item.itemId)}
         />
         <div className="flex flex-col items-center">
-          <div className="w-0.5 h-7 bg-zinc-700"></div>
-          {item.from?.length!! > 1 && (
-            <div
-              className={`${
-                item.from?.length!! > 2 ? "w-[354px]" : "w-[178px]"
-              } h-0.5 bg-zinc-700`}
-            ></div>
-          )}
+          <span className="w-0.5 h-7 bg-zinc-700" />
+          <span
+            className={`h-0.5 bg-zinc-700
+              ${
+                item.from && item.from?.length > 2 ? "w-[354px]" : "w-[178px]"
+              }`}
+          />
         </div>
       </div>
       <div className="flex gap-6">
-        {item.from?.length!! > 0 &&
-          item.from?.map((child) => (
-            <div>
+        {item.from?.map((child) => (
+          <div className="min-w-[152px] flex flex-col items-center">
+            <span className="w-0.5 h-4 bg-zinc-700" />
+            <div
+              key={child.id + child.itemId}
+              className={`h-12 w-12 border-2 border-zinc-700 bg-black ${
+                child.newItemId != undefined && child.newItemId.length > 0
+                  ? "cursor-grab"
+                  : "cursor-default"
+              }`}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                if (
+                  child.newItemId != undefined &&
+                  child.newItemId.length > 0
+                ) {
+                  setItem({
+                    ...item,
+                    from: item.from?.map((f) =>
+                      f.id === child.id ? { ...f, newItemId: "" } : f
+                    ),
+                  });
+                }
+              }}
+              draggable={
+                child.newItemId != undefined && child.newItemId.length > 0
+              }
+              onDragStart={() =>
+                child.newItemId && setSelectedItem(child.newItemId)
+              }
+              onDragEnd={() => {
+                if (child.newItemId) {
+                  setItem({
+                    ...item,
+                    from: item.from?.map((f) =>
+                      f.id === child.id ? { ...f, newItemId: "" } : f
+                    ),
+                  });
+                }
+              }}
+              onDrop={() => {
+                setItem({
+                  ...item,
+                  from: item.from?.map((f) =>
+                    f.id === child.id ? { ...f, newItemId: selectedItem } : f
+                  ),
+                });
+              }}
+              onDragOver={(e) => e.preventDefault()}
+            >
+              {child.newItemId != undefined && child.newItemId.length > 0 && (
+                <img src={getImageByUrl(child.newItemId)} alt={child.name} />
+              )}
+            </div>
+            {child.from && child.from.length > 0 && (
               <div className="flex flex-col items-center">
-                <div className="h-4 w-0.5 bg-zinc-700"></div>
-                <img
-                  key={item.name + child?.itemId + getRandomId(4)}
-                  onClick={() => console.log(child.itemId)}
-                  onDrop={() => {
-                    setItem({
-                      ...item,
-                      from: item.from?.map((f) =>
-                        f.id === child.id
-                          ? { ...f, newItemId: selectedItem }
-                          : f
-                      ),
-                    });
-                    console.log(selectedItem, child.itemId, child.id);
-                  }}
-                  onDragOver={(e) => e.preventDefault()}
-                  className={`overflow-hidden h-12 w-12 border-2 ${
-                    child.status == "valid"
-                      ? "border-green-500"
-                      : "border-zinc-700"
-                  }`}
-                  src={getImageUrl(child?.itemId + ".png")}
-                  alt={child?.name}
-                />
-                {child?.from?.length!! > 0 && (
-                  <div className="flex flex-col items-center">
-                    <div className="h-7 w-0.5 bg-zinc-700"></div>
-                    {child?.from?.length!! > 1 && (
-                      <div
-                        className={`${
-                          child?.from?.length!! > 2 ? "w-[114px]" : "w-[58px]"
-                        } h-0.5 bg-zinc-700`}
-                      ></div>
-                    )}
-                  </div>
+                <span className="w-0.5 h-7 bg-zinc-700" />
+                {child.from.length > 1 && (
+                  <span
+                    className={`h-0.5 bg-zinc-700 ${
+                      child.from.length > 2 ? "w-[114px]" : "w-[58px]"
+                    }`}
+                  />
                 )}
-              </div>
-              <div className={"w-[152px] flex gap-4 justify-center"}>
-                {child?.from?.length!! > 0 &&
-                  child?.from?.map((grandchild) => (
-                    <>
-                      <div className="flex flex-col items-center">
-                        {child?.from?.length && (
-                          <div
-                            className={`${
-                              child?.from?.length!! > 1 ? "h-3.5" : "h-4"
-                            } w-0.5 bg-zinc-700`}
-                          ></div>
-                        )}
-                        <img
-                          key={item.name + grandchild?.itemId + getRandomId(4)}
-                          onDrop={() => {
+                <div className="flex gap-4">
+                  {child.from.map((grandchild) => (
+                    <div className="flex flex-col items-center">
+                      <span
+                        className={`w-0.5 bg-zinc-700 ${
+                          child.from && child.from.length > 1 ? "h-3.5" : "h-4"
+                        }`}
+                      />
+                      <div
+                        key={grandchild.id + grandchild.itemId}
+                        className={`h-10 w-10 border-2 border-zinc-700 bg-black ${
+                          grandchild.newItemId != undefined &&
+                          grandchild.newItemId.length > 0
+                            ? "cursor-grab"
+                            : "cursor-default"
+                        }`}
+                        onContextMenu={(e) => {
+                          e.preventDefault();
+                          if (
+                            child.newItemId != undefined &&
+                            child.newItemId.length > 0
+                          ) {
                             setItem({
                               ...item,
                               from: item.from?.map((f) =>
@@ -95,29 +128,76 @@ function ItemRecipe() {
                                       ...f,
                                       from: f.from?.map((f) =>
                                         f.id === grandchild.id
-                                          ? { ...f, newItemId: selectedItem }
+                                          ? { ...f, newItemId: "" }
                                           : f
                                       ),
                                     }
                                   : f
                               ),
                             });
-                          }}
-                          onDragOver={(e) => e.preventDefault()}
-                          className={`overflow-hidden h-10 w-10 border-2 ${
-                            grandchild.status == "valid"
-                              ? "border-green-500"
-                              : "border-zinc-700"
-                          }`}
-                          src={getImageUrl(grandchild?.itemId + ".png")}
-                          alt={grandchild?.name}
-                        />
+                          }
+                        }}
+                        draggable={
+                          grandchild.newItemId != undefined &&
+                          grandchild.newItemId.length > 0
+                        }
+                        onDragStart={() =>
+                          grandchild.newItemId &&
+                          setSelectedItem(grandchild.newItemId)
+                        }
+                        onDragEnd={() => {
+                          if (child.newItemId) {
+                            setItem({
+                              ...item,
+                              from: item.from?.map((f) =>
+                                f.id === grandchild.id[0]
+                                  ? {
+                                      ...f,
+                                      from: f.from?.map((f) =>
+                                        f.id === grandchild.id
+                                          ? { ...f, newItemId: "" }
+                                          : f
+                                      ),
+                                    }
+                                  : f
+                              ),
+                            });
+                          }
+                        }}
+                        onDrop={() => {
+                          setItem({
+                            ...item,
+                            from: item.from?.map((f) =>
+                              f.id === grandchild.id[0]
+                                ? {
+                                    ...f,
+                                    from: f.from?.map((f) =>
+                                      f.id === grandchild.id
+                                        ? { ...f, newItemId: selectedItem }
+                                        : f
+                                    ),
+                                  }
+                                : f
+                            ),
+                          });
+                        }}
+                        onDragOver={(e) => e.preventDefault()}
+                      >
+                        {grandchild.newItemId != undefined &&
+                          grandchild.newItemId.length > 0 && (
+                            <img
+                              src={getImageByUrl(grandchild.newItemId)}
+                              alt={grandchild.name}
+                            />
+                          )}
                       </div>
-                    </>
+                    </div>
                   ))}
+                </div>
               </div>
-            </div>
-          ))}
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
