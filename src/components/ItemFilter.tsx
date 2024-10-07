@@ -14,7 +14,7 @@ const itemTypes = [
 function ItemFilter() {
   const [isActive, setIsActive] = useState(false);
   return (
-    <div className="grid grid-cols-7 w-full mt-0.5">
+    <div className="mt-0.5 grid w-full grid-cols-7">
       {itemTypes.map((item) => (
         <div
           className="max-h-9 border border-zinc-700 text-red-500"

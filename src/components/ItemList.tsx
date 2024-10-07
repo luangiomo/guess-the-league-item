@@ -1,6 +1,8 @@
 import { useContext } from "react";
 import { ItemContext } from "../contexts/ItemContext";
-import { Item, ItemCategory, getItemsByCategory } from "../utils/getItems";
+import { Item } from "../types/Item";
+import { ItemCategory } from "../types/ItemCategory";
+import { getItemsByCategory } from "../utils/getItems";
 import ItemPicture from "./ItemPicture";
 
 interface Props {
@@ -9,7 +11,8 @@ interface Props {
 }
 
 function ItemList({ category, showTitle }: Props) {
-  const { selectedItem, setSelectedItem } = useContext(ItemContext);
+  const { currentDragItemId, setCurrentDragItemId, setIsDragable } =
+    useContext(ItemContext);
 
   let title: string;
   let items: Item[];
@@ -40,7 +43,7 @@ function ItemList({ category, showTitle }: Props) {
   return (
     <div>
       {showTitle && (
-        <p className="select-none mb-2 text-lg font-semibold text-white">
+        <p className="mb-2 select-none text-lg font-semibold text-white">
           {title}
         </p>
       )}
@@ -50,10 +53,17 @@ function ItemList({ category, showTitle }: Props) {
             key={item.id}
             draggable
             onDragStart={() => {
-              setSelectedItem(item.id), console.log(selectedItem);
+              setIsDragable(true);
+              setCurrentDragItemId(item.id),
+                console.log("comecei pegar o item", currentDragItemId);
             }}
             onDragEnd={() => {
-              setSelectedItem(""), console.log(selectedItem);
+              setIsDragable(false);
+              setCurrentDragItemId(""),
+                console.log("terminei de pegar o item", currentDragItemId);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
             }}
           >
             <ItemPicture item={item} />

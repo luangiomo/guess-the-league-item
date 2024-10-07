@@ -1,22 +1,28 @@
 import { createContext, ReactNode, useState } from "react";
-import { ItemStructure } from "../utils/getItems";
+import { ItemStructure } from "../types/ItemStructure";
+import { getItemToStructure, getRandomItemId } from "../utils/getItems";
 
 type ItemContextType = {
-  selectedItem: string;
-  setSelectedItem: (newState: string) => void;
+  currentDragItemId: string;
+  setCurrentDragItemId: (newState: string) => void;
   item: ItemStructure;
   setItem: (newState: ItemStructure) => void;
+  isDragable: boolean;
+  setIsDragable: (newState: boolean) => void;
 };
 
 const DEFAULT_VALUE: ItemContextType = {
-  selectedItem: "",
-  setSelectedItem: () => {},
+  currentDragItemId: "",
+  setCurrentDragItemId: () => {},
   item: {
     id: "",
     itemId: "",
     status: "pending",
+    from: [],
   },
   setItem: () => {},
+  isDragable: false,
+  setIsDragable: () => {},
 };
 
 interface Props {
@@ -26,12 +32,32 @@ interface Props {
 export const ItemContext = createContext<ItemContextType>(DEFAULT_VALUE);
 
 export const ItemContextProvider = ({ children }: Props) => {
-  const [selectedItem, setSelectedItem] = useState(DEFAULT_VALUE.selectedItem);
-  const [item, setItem] = useState(DEFAULT_VALUE.item);
+  const [currentDragItemId, setCurrentDragItemId] = useState(
+    DEFAULT_VALUE.currentDragItemId,
+  );
+  const [item, setItem] = useState(() => {
+    try {
+      const storage = localStorage.getItem("sortedItem");
+      return storage
+        ? JSON.parse(storage)
+        : getItemToStructure(getRandomItemId());
+    } catch (error) {
+      console.log(error);
+      return DEFAULT_VALUE.item;
+    }
+  });
+  const [isDragable, setIsDragable] = useState(DEFAULT_VALUE.isDragable);
 
   return (
     <ItemContext.Provider
-      value={{ selectedItem, setSelectedItem, item, setItem }}
+      value={{
+        currentDragItemId: currentDragItemId,
+        setCurrentDragItemId: setCurrentDragItemId,
+        item,
+        setItem,
+        isDragable,
+        setIsDragable,
+      }}
     >
       {children}
     </ItemContext.Provider>

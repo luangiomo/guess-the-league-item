@@ -1,4 +1,8 @@
 import database from "../data/item.json";
+import { Item } from "../types/Item";
+import { ItemCategory } from "../types/ItemCategory";
+import { ItemStructure } from "../types/ItemStructure";
+import { Status } from "../types/Status";
 import { getRandomNumber } from "./getRandoms";
 
 const basicItemsId: string[] = [
@@ -149,7 +153,6 @@ const legendaryItemsId: string[] = [
   "3002",
   "3110",
   "6695",
-  "3119",
   "3107",
   "3222",
   "3504",
@@ -170,36 +173,6 @@ const allItemsId: string[] = [
   ...epicItemsId,
   ...legendaryItemsId,
 ];
-
-export interface Item {
-  id: string;
-  name: string;
-  description: string;
-  colloq: string;
-  plaintext: string;
-  image: {
-    full: string;
-    sprite: string;
-    group: string;
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-  gold: {
-    base: number;
-    purchasable: boolean;
-    total: number;
-    sell: number;
-  };
-  tags: string[];
-  maps?: any;
-  stats?: any;
-  into?: string[];
-  from?: string[];
-}
-
-export type ItemCategory = "all" | "basics" | "epics" | "legendaries";
 
 const getAllItems = () => {
   const items = Object.values(database.data);
@@ -256,15 +229,14 @@ const recycleItemsSorted = (sortedId: number, list: string[]) => {
   } else {
     sortedItems.push(removedItem);
   }
+  console.log(sortedItems)
 };
 
-export const getRandomItem = (): Item => {
+export const getRandomItemId = (): string => {
   const randomId = getRandomNumber(legendaryItemsIdCopy.length);
-  const itemsList = getItemsByCategory("legendaries");
   const sortedId = legendaryItemsIdCopy[randomId];
-  const sortedItem = itemsList.find((item) => item.id === sortedId);
   recycleItemsSorted(randomId, legendaryItemsIdCopy);
-  return sortedItem!!;
+  return sortedId;
 };
 
 export const getRandomItemByCategory = (itemCategory: ItemCategory) => {
@@ -277,17 +249,6 @@ export const getRandomItemByCategory = (itemCategory: ItemCategory) => {
     return sortedId;
   }
 };
-
-export interface ItemStructure {
-  id: string;
-  itemId: string;
-  name?: string;
-  newItemId?: string;
-  status: Status;
-  from?: ItemStructure[];
-}
-
-export type Status = "pending" | "valid" | "invalid" | "partial";
 
 export const getItemToStructure = (itemId: string) => {
   const { id, from } = getItemById(itemId);
@@ -305,7 +266,6 @@ export const getItemToStructure = (itemId: string) => {
       const objectChild: ItemStructure = {
         id: (index + 1).toString(),
         itemId: f,
-        newItemId: undefined,
         status: DEFAULT_STATUS,
         from: [],
       };
@@ -315,14 +275,15 @@ export const getItemToStructure = (itemId: string) => {
           const objectGrandchild: ItemStructure = {
             id: (objectChild.id + (index + 1)).toString(),
             itemId: c,
-            newItemId: undefined,
             status: DEFAULT_STATUS,
           };
           objectChild.from?.push(objectGrandchild);
         });
       object.from?.push(objectChild);
     });
+    localStorage.setItem("sortedItem", JSON.stringify(object))
     return object;
   }
+  localStorage.setItem("sortedItem", JSON.stringify(object))
   return object;
 };

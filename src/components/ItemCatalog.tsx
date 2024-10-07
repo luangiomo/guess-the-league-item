@@ -2,7 +2,7 @@ import ItemList from "./ItemList";
 
 function ItemCatalog() {
   return (
-    <div className="flex flex-col gap-6 px-6 py-8 rounded-s-lg bg-zinc-900">
+    <div className="flex flex-col gap-6 rounded-s-lg bg-zinc-900 px-6 py-8">
       {/* <ItemFilter /> */}
       <ItemList category={"basics"} showTitle />
       <ItemList category={"epics"} showTitle />

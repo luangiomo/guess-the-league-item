@@ -1,0 +1,1 @@
+export type ItemCategory = "all" | "basics" | "epics" | "legendaries";
