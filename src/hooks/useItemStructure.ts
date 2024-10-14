@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { getItemById, Item, ItemStructure, Status } from "../utils/getItems";
+import { ItemStructure } from "../types/ItemStructure";
+import { getItemById } from "../utils/getItems";
+import { Status } from "../types/Status";
 
 export function useItemStructure(itemId: string) {
   const [itemStructure, setItemStructure] = useState<ItemStructure>();
@@ -13,6 +15,7 @@ export function useItemStructure(itemId: string) {
       id: "0",
       itemId: id,
       status: DEFAULT_STATUS,
+      newItemId: "",
       from: [],
     };
     if (from != undefined && from?.length > 0) {
@@ -22,6 +25,7 @@ export function useItemStructure(itemId: string) {
           id: (index + 1).toString(),
           itemId: f,
           status: DEFAULT_STATUS,
+          newItemId: "",
           from: [],
         };
         const childFrom = getItemById(f).from;
@@ -30,6 +34,7 @@ export function useItemStructure(itemId: string) {
             const objectGrandchild: ItemStructure = {
               id: (objectChild.id + (index + 1)).toString(),
               itemId: c,
+              newItemId: "",
               status: DEFAULT_STATUS,
             };
             objectChild.from?.push(objectGrandchild);

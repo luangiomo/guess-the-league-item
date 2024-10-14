@@ -242,9 +242,9 @@ export const getRandomItemId = (): string => {
 export const getRandomItemByCategory = (itemCategory: ItemCategory) => {
   if (itemCategory === "legendaries") {
     const randomId = getRandomNumber(legendaryItemsIdCopy.length);
-    const itemsList = getItemsByCategory(itemCategory);
+    // const itemsList = getItemsByCategory(itemCategory);
     const sortedId = legendaryItemsIdCopy[randomId];
-    const sortedItem = itemsList?.find((item) => item.id === sortedId);
+    // const sortedItem = itemsList?.find((item) => item.id === sortedId);
     recycleItemsSorted(randomId, legendaryItemsIdCopy);
     return sortedId;
   }
@@ -257,6 +257,7 @@ export const getItemToStructure = (itemId: string) => {
   const object: ItemStructure = {
     id: "0",
     itemId: id,
+    newItemId: "",
     status: DEFAULT_STATUS,
     from: [],
   };

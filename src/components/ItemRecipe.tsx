@@ -12,8 +12,6 @@ function ItemRecipe() {
     setCurrentDragItemId,
     isDraggable,
     setIsDraggable,
-    item,
-    setItem,
   } = useContext(ItemContext);
 
   const [previousItemId, setPreviousItemId] = useState("");
@@ -49,20 +47,20 @@ function ItemRecipe() {
 
   const [state, dispatch] = useReducer(itemReducer, getInitialState());
 
-  const getBorderColorFromItemStatus = (status: Status): string => {
-    switch (status) {
-      case "valid":
-        return "border-green-400";
-      case "pending":
-        return "border-zinc-700";
-      case "invalid":
-        return "border-red-600";
-      case "partial":
-        return "border-yellow-400";
-      default:
-        return "border-zinc-700";
-    }
-  };
+  // const getBorderColorFromItemStatus = (status: Status): string => {
+  //   switch (status) {
+  //     case "valid":
+  //       return "border-green-400";
+  //     case "pending":
+  //       return "border-zinc-700";
+  //     case "invalid":
+  //       return "border-red-600";
+  //     case "partial":
+  //       return "border-yellow-400";
+  //     default:
+  //       return "border-zinc-700";
+  //   }
+  // };
 
   return (
     <div>

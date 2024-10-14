@@ -17,6 +17,7 @@ const DEFAULT_VALUE: ItemContextType = {
   item: {
     id: "",
     itemId: "",
+    newItemId: "",
     status: "pending",
     from: [],
   },

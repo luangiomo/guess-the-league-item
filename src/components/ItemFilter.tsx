@@ -12,18 +12,19 @@ const itemTypes = [
 ];
 
 function ItemFilter() {
-  const [isActive, setIsActive] = useState(false);
+  // const [isActive, setIsActive] = useState(false);
   return (
-    <div className="mt-0.5 grid w-full grid-cols-7">
-      {itemTypes.map((item) => (
-        <div
-          className="max-h-9 border border-zinc-700 text-red-500"
-          onClick={() => setIsActive(true)}
-        >
-          <Icon size={48} />
-        </div>
-      ))}
-    </div>
+    <div></div>
+    // <div className="mt-0.5 grid w-full grid-cols-7">
+    //   {itemTypes.map((item) => (
+    //     <div
+    //       className="max-h-9 border border-zinc-700 text-red-500"
+    //       onClick={() => setIsActive(true)}
+    //     >
+    //       <Icon size={48} />
+    //     </div>
+    //   ))}
+    // </div>
   );
 }
 
