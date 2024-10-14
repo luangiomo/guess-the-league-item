@@ -1,15 +1,12 @@
-import { useState } from "react";
-import Icon from "../assets/icons/Icon";
-
-const itemTypes = [
-  "all",
-  "fighter",
-  "marksman",
-  "assasin",
-  "mage",
-  "tank",
-  "support",
-];
+// const itemTypes = [
+//   "all",
+//   "fighter",
+//   "marksman",
+//   "assasin",
+//   "mage",
+//   "tank",
+//   "support",
+// ];
 
 function ItemFilter() {
   // const [isActive, setIsActive] = useState(false);

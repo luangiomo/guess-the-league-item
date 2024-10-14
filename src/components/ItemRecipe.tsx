@@ -1,10 +1,9 @@
 import { useContext, useEffect, useReducer, useState } from "react";
 import { ItemContext } from "../contexts/ItemContext";
-import { Status } from "../types/Status";
-import { getImageByUrl } from "../utils/getImageUrl";
-import { ItemStructure } from "../types/ItemStructure";
-import { getItemToStructure, getRandomItemId } from "../utils/getItems";
 import { itemReducer } from "../reducers/ItemReducer";
+import { ItemStructure } from "../types/ItemStructure";
+import { getImageByUrl } from "../utils/getImageUrl";
+import { getItemToStructure, getRandomItemId } from "../utils/getItems";
 
 function ItemRecipe() {
   const {
