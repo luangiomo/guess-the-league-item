@@ -11,7 +11,7 @@ interface Props {
 }
 
 function ItemList({ category, showTitle }: Props) {
-  const { currentDragItemId, setCurrentDragItemId, setIsDragable } =
+  const { currentDragItemId, setCurrentDragItemId, setIsDraggable } =
     useContext(ItemContext);
 
   let title: string;
@@ -53,12 +53,12 @@ function ItemList({ category, showTitle }: Props) {
             key={item.id}
             draggable
             onDragStart={() => {
-              setIsDragable(true);
+              setIsDraggable(true);
               setCurrentDragItemId(item.id),
                 console.log("comecei pegar o item", currentDragItemId);
             }}
             onDragEnd={() => {
-              setIsDragable(false);
+              setIsDraggable(false);
               setCurrentDragItemId(""),
                 console.log("terminei de pegar o item", currentDragItemId);
             }}

@@ -229,7 +229,7 @@ const recycleItemsSorted = (sortedId: number, list: string[]) => {
   } else {
     sortedItems.push(removedItem);
   }
-  console.log(sortedItems)
+  console.log(sortedItems);
 };
 
 export const getRandomItemId = (): string => {
@@ -267,6 +267,7 @@ export const getItemToStructure = (itemId: string) => {
         id: (index + 1).toString(),
         itemId: f,
         status: DEFAULT_STATUS,
+        newItemId: "",
         from: [],
       };
       const childFrom = getItemById(f).from;
@@ -276,14 +277,15 @@ export const getItemToStructure = (itemId: string) => {
             id: (objectChild.id + (index + 1)).toString(),
             itemId: c,
             status: DEFAULT_STATUS,
+            newItemId: "",
           };
           objectChild.from?.push(objectGrandchild);
         });
       object.from?.push(objectChild);
     });
-    localStorage.setItem("sortedItem", JSON.stringify(object))
+    // localStorage.setItem("sortedItem", JSON.stringify(object))
     return object;
   }
-  localStorage.setItem("sortedItem", JSON.stringify(object))
+  // localStorage.setItem("sortedItem", JSON.stringify(object))
   return object;
 };

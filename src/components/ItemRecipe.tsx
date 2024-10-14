@@ -1,56 +1,53 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 import { ItemContext } from "../contexts/ItemContext";
-import { ItemStructure } from "../types/ItemStructure";
 import { Status } from "../types/Status";
 import { getImageByUrl } from "../utils/getImageUrl";
+import { ItemStructure } from "../types/ItemStructure";
+import { getItemToStructure, getRandomItemId } from "../utils/getItems";
+import { itemReducer } from "../reducers/ItemReducer";
 
 function ItemRecipe() {
-  const { currentDragItemId, setCurrentDragItemId, item, setItem, isDragable } =
-    useContext(ItemContext);
+  const {
+    currentDragItemId,
+    setCurrentDragItemId,
+    isDraggable,
+    setIsDraggable,
+    item,
+    setItem,
+  } = useContext(ItemContext);
 
-  const [sortedItemId, setSortedItemId] = useState<string>("");
+  const [previousItemId, setPreviousItemId] = useState("");
 
-  const handleChangeItem = (action: "edit" | "remove", itemId: string) => {
-    const childId = ["1", "2", "3"];
-    let updatedItem = {} as ItemStructure;
+  useEffect(() => {
+    if (previousItemId) console.log(previousItemId);
+  }, [previousItemId]);
 
-    if (childId.includes(itemId)) {
-      console.log("entrei id child");
-      updatedItem = {
-        ...item,
-        from: item.from?.map((itemFrom) =>
-          itemFrom.id === itemId
-            ? {
-                ...itemFrom,
-                newItemId: action == "edit" ? currentDragItemId : "",
-              }
-            : itemFrom,
-        ),
-      };
-    } else {
-      updatedItem = {
-        ...item,
-        from: item.from?.map((child) =>
-          child.id === itemId[0]
-            ? {
-                ...child,
-                from: child.from?.map((grandchild) =>
-                  grandchild.id === itemId
-                    ? {
-                        ...grandchild,
-                        newItemId: action == "edit" ? currentDragItemId : "",
-                      }
-                    : grandchild,
-                ),
-              }
-            : child,
-        ),
+  // let initialState: ItemStructure = {
+  //   id: "0",
+  //   itemId: "",
+  //   status: "pending",
+  //   from: [],
+  // };
+
+  const getInitialState = (): ItemStructure => {
+    try {
+      const storage = localStorage.getItem("item");
+      return storage
+        ? JSON.parse(storage)
+        : getItemToStructure(getRandomItemId());
+    } catch (error) {
+      console.log(error);
+      return {
+        id: "0",
+        itemId: "",
+        status: "pending",
+        newItemId: "",
+        from: [],
       };
     }
-
-    localStorage.setItem("sortedItem", JSON.stringify(updatedItem));
-    setItem(updatedItem);
   };
+
+  const [state, dispatch] = useReducer(itemReducer, getInitialState());
 
   const getBorderColorFromItemStatus = (status: Status): string => {
     switch (status) {
@@ -67,32 +64,14 @@ function ItemRecipe() {
     }
   };
 
-  // const getBorderColorFromDraggableState = (
-  //   item: string | undefined,
-  // ): string => {
-  //   if (item != undefined && item.length > 0) {
-  //     if (isDragable) {
-  //       return `border-red-500 ${getCursorFromState(true)}`;
-  //     }
-  //     return getCursorFromState(true);
-  //   } else {
-  //     if (isDragable) {
-  //       return `border-blue-500 ${getCursorFromState(false)}`;
-  //     }
-  //     return getCursorFromState(false);
-  //   }
-
-  //   function getCursorFromState(state: boolean) {
-  //     return state ? "cursor-grab" : "cursor-default";
-  //   }
-  // };
-
   return (
     <div>
       <div className="text-white">
-        <p>{item.itemId}</p>
+        <p>
+          {state.itemId} {previousItemId}
+        </p>
         <span>
-          {isDragable ? "Sim" : "Não"} {currentDragItemId}
+          {isDraggable ? "Sim" : "Não"} {currentDragItemId}
         </span>
       </div>
       <div className="flex flex-col items-center">
@@ -101,40 +80,67 @@ function ItemRecipe() {
           draggable={"false"}
           style={{
             backgroundSize: "contain",
-            backgroundImage: `url(${getImageByUrl(item.itemId)})`,
+            backgroundImage: `url(${getImageByUrl(state.itemId)})`,
           }}
         />
         <div className="flex flex-col items-center">
           <span className="h-7 w-0.5 bg-zinc-700" />
           <span
             className={`h-0.5 bg-zinc-700 ${
-              item.from && item.from?.length > 2 ? "w-[354px]" : "w-[178px]"
+              state.from && state.from?.length > 2 ? "w-[354px]" : "w-[181px]"
             }`}
           />
         </div>
       </div>
-      <div className="flex gap-6">
-        {item.from?.map((child) => (
+      <div className="flex justify-between gap-6">
+        {state.from?.map((child) => (
           <div className="flex min-w-[152px] flex-col items-center">
             <span className="h-4 w-0.5 bg-zinc-700" />
-            <div
-              key={child.id + child.itemId}
-              className={`h-12 w-12 border-2 bg-black ${getBorderColorFromItemStatus(child.status)} ${
-                isDragable && "border-blue-500"
-                // child.newItemId != undefined && child.newItemId.length > 0
-                //   ? "cursor-grab"
-                //   : "cursor-default"
-              } `}
-              draggable={
-                child.newItemId != undefined && child.newItemId.length > 0
-              }
-              onDragStart={() =>
+            <button
+              key={child.id}
+              className={`h-12 w-12 border-2 bg-black ${
+                isDraggable ? "border-blue-500" : "border-zinc-700"
+              } ${
                 child.newItemId != undefined &&
                 child.newItemId.length > 0 &&
-                setCurrentDragItemId(child.newItemId)
+                child.status != "valid"
+                  ? "cursor-grab"
+                  : "cursor-default"
+              }`}
+              draggable={
+                child.newItemId != undefined &&
+                child.newItemId.length > 0 &&
+                child.status != "valid"
               }
+              onDragStart={() => {
+                if (
+                  child.newItemId != undefined &&
+                  child.newItemId.length > 0
+                ) {
+                  setIsDraggable(true);
+                  setCurrentDragItemId(child.newItemId);
+                  setPreviousItemId(child.id);
+                }
+              }}
+              onDragEnd={() => {
+                setIsDraggable(false);
+                setCurrentDragItemId("");
+                setPreviousItemId("");
+              }}
               onDrop={() => {
-                handleChangeItem("edit", child.id);
+                if (previousItemId != undefined && previousItemId.length > 0) {
+                  dispatch({
+                    type: "switch_items",
+                    itemId: child.id,
+                    previousItemId: previousItemId,
+                  });
+                  return;
+                }
+                dispatch({
+                  type: "add_item",
+                  itemId: child.id,
+                  currentDragItemId: currentDragItemId,
+                });
               }}
               onDragLeave={(e) => {
                 e.preventDefault();
@@ -146,17 +152,20 @@ function ItemRecipe() {
                   child.newItemId != undefined &&
                   child.newItemId.length > 0
                 ) {
-                  handleChangeItem("remove", child.id);
+                  dispatch({
+                    type: "delete_item",
+                    itemId: child.id,
+                  });
                 }
               }}
               style={{
                 backgroundSize: "contain",
                 backgroundImage:
                   child.newItemId != undefined
-                    ? `url(${getImageByUrl(child.newItemId!!)})`
+                    ? `url(${getImageByUrl(child.newItemId)})`
                     : "",
               }}
-            ></div>
+            />
             {child.from && child.from.length > 0 && (
               <div className="flex flex-col items-center">
                 <span className="h-7 w-0.5 bg-zinc-700" />
@@ -176,19 +185,51 @@ function ItemRecipe() {
                         }`}
                       />
                       <div
-                        key={grandchild.id + grandchild.itemId}
-                        className={`h-10 w-10 border-2 border-zinc-700 bg-black ${isDragable && "border-blue-500"}`}
-                        draggable={
-                          grandchild.newItemId != undefined &&
-                          grandchild.newItemId.length > 0
-                        }
-                        onDragStart={() =>
+                        key={grandchild.id}
+                        className={`h-10 w-10 border-2 bg-black ${isDraggable ? "border-blue-500" : "border-zinc-700"} ${
                           grandchild.newItemId != undefined &&
                           grandchild.newItemId.length > 0 &&
-                          setCurrentDragItemId(grandchild.newItemId)
+                          grandchild.status != "valid"
+                            ? "cursor-grab"
+                            : "cursor-default"
+                        }`}
+                        draggable={
+                          grandchild.newItemId != undefined &&
+                          grandchild.newItemId.length > 0 &&
+                          grandchild.status != "valid"
                         }
+                        onDragStart={() => {
+                          if (
+                            grandchild.newItemId != undefined &&
+                            grandchild.newItemId.length > 0
+                          ) {
+                            setIsDraggable(true);
+                            setCurrentDragItemId(grandchild.newItemId);
+                            setPreviousItemId(grandchild.id);
+                          }
+                        }}
+                        onDragEnd={() => {
+                          setIsDraggable(false);
+                          setCurrentDragItemId("");
+                          setPreviousItemId("");
+                        }}
                         onDrop={() => {
-                          handleChangeItem("edit", grandchild.id);
+                          if (
+                            previousItemId != undefined &&
+                            previousItemId.length > 0
+                          ) {
+                            dispatch({
+                              type: "switch_items",
+                              itemId: grandchild.id,
+                              previousItemId: previousItemId,
+                            });
+                            return;
+                          }
+                          dispatch({
+                            type: "add_item",
+                            itemId: grandchild.id,
+                            currentDragItemId: currentDragItemId,
+                          });
                         }}
                         onDragLeave={(e) => {
                           e.preventDefault();
@@ -200,7 +241,10 @@ function ItemRecipe() {
                             grandchild.newItemId != undefined &&
                             grandchild.newItemId.length > 0
                           ) {
-                            handleChangeItem("remove", grandchild.id);
+                            dispatch({
+                              type: "delete_item",
+                              itemId: grandchild.id,
+                            });
                           }
                         }}
                         style={{

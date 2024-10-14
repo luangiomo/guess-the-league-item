@@ -7,8 +7,8 @@ type ItemContextType = {
   setCurrentDragItemId: (newState: string) => void;
   item: ItemStructure;
   setItem: (newState: ItemStructure) => void;
-  isDragable: boolean;
-  setIsDragable: (newState: boolean) => void;
+  isDraggable: boolean;
+  setIsDraggable: (newState: boolean) => void;
 };
 
 const DEFAULT_VALUE: ItemContextType = {
@@ -21,8 +21,8 @@ const DEFAULT_VALUE: ItemContextType = {
     from: [],
   },
   setItem: () => {},
-  isDragable: false,
-  setIsDragable: () => {},
+  isDraggable: false,
+  setIsDraggable: () => {},
 };
 
 interface Props {
@@ -46,7 +46,7 @@ export const ItemContextProvider = ({ children }: Props) => {
       return DEFAULT_VALUE.item;
     }
   });
-  const [isDragable, setIsDragable] = useState(DEFAULT_VALUE.isDragable);
+  const [isDraggable, setIsDraggable] = useState(DEFAULT_VALUE.isDraggable);
 
   return (
     <ItemContext.Provider
@@ -55,8 +55,8 @@ export const ItemContextProvider = ({ children }: Props) => {
         setCurrentDragItemId: setCurrentDragItemId,
         item,
         setItem,
-        isDragable,
-        setIsDragable,
+        isDraggable,
+        setIsDraggable,
       }}
     >
       {children}
