@@ -34,17 +34,26 @@ function ItemRecipe() {
         : getItemToStructure(getRandomItemId());
     } catch (error) {
       console.log(error);
-      return {
-        id: "0",
-        itemId: "",
-        status: "pending",
-        newItemId: "",
-        from: [],
-      };
+      return getItemToStructure(getRandomItemId());
     }
   };
 
   const [state, dispatch] = useReducer(itemReducer, getInitialState());
+  const [randomItem, setRandomItem] = useState<ItemStructure>();
+
+  useEffect(() => {
+    //Implementing the setInterval method
+    const interval = setInterval(() => {
+      console.log("entrei useEffect");
+      setRandomItem(getItemToStructure(getRandomItemId()));
+      randomItem != undefined
+        ? dispatch({ type: "change_item", item: randomItem })
+        : getInitialState();
+    }, 10000);
+
+    //Clearing the interval
+    return () => clearInterval(interval);
+  }, [randomItem]);
 
   // const getBorderColorFromItemStatus = (status: Status): string => {
   //   switch (status) {

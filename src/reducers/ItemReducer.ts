@@ -7,7 +7,8 @@ type ActionProps =
       type: "switch_items";
       itemId: string;
       previousItemId: string;
-    };
+    }
+  | { type: "change_item"; item: ItemStructure };
 
 let item = {} as ItemStructure;
 
@@ -129,6 +130,11 @@ export function itemReducer(
       };
       localStorage.setItem("item", JSON.stringify(item));
       return item;
+    case "change_item": {
+      item = action.item;
+      localStorage.setItem("item", JSON.stringify(item));
+      return item;
+    }
     default:
       throw new Error();
   }
