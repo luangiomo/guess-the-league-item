@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { DragContext } from "../contexts/DragContext";
-import { ItemType } from "../types/ItemType";
 import { ItemCategory } from "../types/ItemCategoryType";
+import { ItemType } from "../types/ItemType";
 import { getImageByItemId } from "../utils/getImageUrl";
 import { getItemsByCategory } from "../utils/getItems";
 
@@ -14,8 +14,6 @@ interface Props {
 
 function ItemList({ category, showTitle }: Props) {
   const { setCurrentDragId, setIsDraggable } = useContext(DragContext);
-  const [filteredList, setfilteredList] = useState<ItemType[]>([]);
-  const [filter, setFilter] = useState("");
   let title: string;
   let items: ItemType[];
 
@@ -23,25 +21,21 @@ function ItemList({ category, showTitle }: Props) {
     case "all": {
       title = "Todos os itens";
       items = getItemsByCategory(category);
-      console.log(items);
       break;
     }
     case "basics": {
       title = "Iniciais & Básicos";
       items = getItemsByCategory(category);
-      console.log(items);
       break;
     }
     case "epics": {
       title = "Épicos";
       items = getItemsByCategory(category);
-      console.log(items);
       break;
     }
     case "legendaries": {
       title = "Lendários";
       items = getItemsByCategory(category);
-      console.log(items);
       break;
     }
   }
