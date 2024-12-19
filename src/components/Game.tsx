@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Heart, RightClick } from "../assets/icons";
 import { GameStateContext } from "../contexts/GameStateContext";
 import { ItemRecipeType } from "../types/ItemRecipeType";
@@ -9,7 +9,6 @@ import MyButton from "./ui/MyButton";
 function Game() {
   const { gameState, setGameState, item, dispatch } =
     useContext(GameStateContext);
-  const [showModal, setShowModal] = useState(false);
 
   const checkStatus = () => {
     dispatch({ type: "check_status" });
