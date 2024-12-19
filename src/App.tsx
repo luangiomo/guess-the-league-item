@@ -1,17 +1,18 @@
-import ItemCatalog from "./components/ItemCatalog";
-import ItemTree from "./components/ItemTree";
-import { ItemContextProvider } from "./contexts/ItemContext";
+import Header from "./components/Header";
+import { DragContextProvider } from "./contexts/DragContext";
+import { GameStateContextProvider } from "./contexts/GameStateContext";
+import Home from "./pages/Home";
 
 function App() {
   return (
-    <main className="h-screen gap-12 flex justify-center items-center">
-      <div className="flex">
-        <ItemContextProvider>
-          <ItemCatalog />
-          <ItemTree />
-        </ItemContextProvider>
-      </div>
-    </main>
+    <>
+      <Header />
+      <DragContextProvider>
+        <GameStateContextProvider>
+          <Home />
+        </GameStateContextProvider>
+      </DragContextProvider>
+    </>
   );
 }
 

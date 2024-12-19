@@ -1,162 +1,142 @@
-import { ItemStructure } from "../types/ItemStructure";
+import { ItemRecipeType } from "../types/ItemRecipeType";
+import { getRecipeFromItemId } from "../utils/getItems";
 
-type ActionProps =
-  | { type: "add_item"; itemId: string; currentDragItemId: string }
-  | { type: "delete_item"; itemId: string }
+export type ActionProps =
+  | { type: "add_item"; position: string; currentDragId: string }
+  | { type: "delete_item"; position: string }
   | {
       type: "switch_items";
-      itemId: string;
-      previousItemId: string;
+      newItem: {
+        id: string;
+        position: string;
+      };
+      oldItem: {
+        id: string;
+        position: string;
+      };
     }
-  | { type: "change_item"; item: ItemStructure };
-
-let item = {} as ItemStructure;
+  | {
+      type: "change_full_item";
+      id: string;
+    }
+  | {
+      type: "check_status";
+    };
 
 export function itemReducer(
-  state: ItemStructure,
+  state: ItemRecipeType,
   action: ActionProps,
-): ItemStructure {
+): ItemRecipeType {
   switch (action.type) {
     case "add_item":
-      item = {
+      return {
         ...state,
         from: state.from?.map((child) =>
-          child.id === action.itemId
+          child.position === action.position
             ? {
                 ...child,
-                newItemId: action.currentDragItemId,
+                droppedId: action.currentDragId,
                 status: "pending",
               }
-            : child.id === action.itemId[0]
-              ? {
-                  ...child,
-                  from: child.from?.map((grandchild) =>
-                    grandchild.id === action.itemId
-                      ? {
-                          ...grandchild,
-                          newItemId: action.currentDragItemId,
-                          status: "pending",
-                        }
-                      : grandchild,
-                  ),
-                }
-              : child,
+            : {
+                ...child,
+                from: child.from?.map((grandchild) =>
+                  grandchild.position === action.position
+                    ? {
+                        ...grandchild,
+                        droppedId: action.currentDragId,
+                        status: "pending",
+                      }
+                    : grandchild,
+                ),
+              },
         ),
       };
-      localStorage.setItem("item", JSON.stringify(item));
-      return item;
     case "switch_items":
-      console.log(action.previousItemId);
-      console.log(action.itemId);
-      item = {
+      return {
         ...state,
         from: state.from?.map((child) => {
-          if (child.id === action.itemId) {
-            console.log("entrei if itemId");
+          if (child.position === action.newItem.position) {
             return {
               ...child,
-              newItemId: findNewItemByItemId(action.previousItemId),
-              status: "pending",
-            };
-          } else if (child.id === action.itemId[0]) {
-            console.log("entrei else if itemId grandchild");
-            return {
-              ...child,
-              from: child.from?.map((grandchild) =>
-                grandchild.id === action.itemId
-                  ? {
-                      ...grandchild,
-                      newItemId: findNewItemByItemId(action.previousItemId),
-                      status: "pending",
-                    }
-                  : grandchild,
-              ),
+              droppedId: action.oldItem.id,
+              status: action.oldItem.id !== "" ? "pending" : "empty",
             };
           }
-          if (child.id === action.previousItemId) {
-            console.log(action.previousItemId);
-            console.log("entrei if previousId");
+          if (child.position === action.oldItem.position) {
             return {
               ...child,
-              newItemId: findNewItemByItemId(action.itemId),
-              status: "pending",
-            };
-          } else if (child.id === action.previousItemId[0]) {
-            console.log("entrei else grandchild previousId");
-            return {
-              ...child,
-              from: child.from?.map((grandchild) =>
-                grandchild.id === action.previousItemId
-                  ? {
-                      ...grandchild,
-                      newItemId: findNewItemByItemId(action.itemId),
-                      status: "pending",
-                    }
-                  : grandchild,
-              ),
+              droppedId: action.newItem.id,
+              status: action.newItem.id !== "" ? "pending" : "empty",
             };
           }
-          return child;
+          return {
+            ...child,
+            from: child.from?.map((grandchild) => {
+              if (grandchild.position === action.newItem.position) {
+                return {
+                  ...grandchild,
+                  droppedId: action.oldItem.id,
+                  status: action.oldItem.id !== "" ? "pending" : "empty",
+                };
+              }
+              if (grandchild.position === action.oldItem.position) {
+                return {
+                  ...grandchild,
+                  droppedId: action.newItem.id,
+                  status: action.newItem.id !== "" ? "pending" : "empty",
+                };
+              }
+              return grandchild;
+            }),
+          };
         }),
       };
-      console.log(item);
-      localStorage.setItem("item", JSON.stringify(item));
-      return item;
     case "delete_item":
-      item = {
+      return {
         ...state,
         from: state.from?.map((child) =>
-          child.id === action.itemId
+          child.position === action.position
             ? {
                 ...child,
-                newItemId: "",
-                status: "pending",
+                droppedId: "",
+                status: "empty",
               }
-            : child.id === action.itemId[0]
-              ? {
-                  ...child,
-                  from: child.from?.map((grandchild) =>
-                    grandchild.id === action.itemId
-                      ? {
-                          ...grandchild,
-                          newItemId: "",
-                          status: "pending",
-                        }
-                      : grandchild,
-                  ),
-                }
-              : child,
+            : {
+                ...child,
+                from: child.from?.map((grandchild) =>
+                  grandchild.position === action.position
+                    ? {
+                        ...grandchild,
+                        droppedId: "",
+                        status: "empty",
+                      }
+                    : grandchild,
+                ),
+              },
         ),
       };
-      localStorage.setItem("item", JSON.stringify(item));
-      return item;
-    case "change_item": {
-      item = action.item;
-      localStorage.setItem("item", JSON.stringify(item));
-      return item;
+    case "change_full_item": {
+      return getRecipeFromItemId(action.id);
     }
+    case "check_status":
+      return {
+        ...state,
+        from: state.from?.map((child) => {
+          return {
+            ...child,
+            status: child.id === child.droppedId ? "valid" : "invalid",
+            from: child.from?.map((grandchild) => {
+              return {
+                ...grandchild,
+                status:
+                  grandchild.id === grandchild.droppedId ? "valid" : "invalid",
+              };
+            }),
+          };
+        }),
+      };
     default:
       throw new Error();
-  }
-
-  function findNewItemByItemId(id: string): string {
-    let newItemId: string | undefined;
-
-    newItemId = state.from?.find((child) => child.id === id)?.newItemId;
-    if (newItemId != undefined) {
-      console.log(newItemId);
-      return newItemId;
-    }
-
-    newItemId = state.from
-      ?.find((child) => child.id === id[0])
-      ?.from?.find((grandchild) => grandchild.id === id)?.newItemId;
-    if (newItemId != undefined) {
-      console.log(newItemId);
-      return newItemId;
-    }
-
-    console.log(newItemId);
-    return "";
   }
 }

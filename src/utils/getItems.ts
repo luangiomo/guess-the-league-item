@@ -1,180 +1,178 @@
 import database from "../data/item.json";
-import { Item } from "../types/Item";
-import { ItemCategory } from "../types/ItemCategory";
-import { ItemStructure } from "../types/ItemStructure";
-import { Status } from "../types/Status";
-import { getRandomNumber } from "./getRandoms";
+import { ItemCategory } from "../types/ItemCategoryType";
+import { ItemRecipeType } from "../types/ItemRecipeType";
+import { ItemStatusType } from "../types/ItemStatusType";
+import { ItemType } from "../types/ItemType";
+import { getRandomNumber } from "./getRandomNumber";
 
-const basicItemsId: string[] = [
+const basics: string[] = [
   "1038",
   "1058",
   "1037",
   "1026",
   "1018",
-  "1033",
   "1028",
+  "1033",
   "1052",
-  "1027",
   "1036",
+  "3070",
   "1006",
+  "1027",
   "1029",
   "1042",
-  "1004",
   "2022",
+  "1004",
 ];
-const epicItemsId: string[] = [
+const epics: string[] = [
   "2420",
   "4632",
-  "3041",
   "3035",
-  "6670",
   "2020",
-  "3051",
   "3140",
   "3147",
   "3155",
   "3803",
+  "6670",
   "3211",
+  "3051",
   "3077",
+  "3086",
   "3802",
   "2021",
   "2019",
   "3044",
-  "3086",
-  "3133",
   "3145",
   "4630",
-  "4638",
+  "3133",
   "3082",
   "3134",
-  "4642",
-  "3024",
   "1011",
   "1053",
-  "1057",
   "2508",
+  "3024",
   "3057",
-  "3108",
-  "3144",
-  "6660",
-  "6690",
   "3113",
+  "4642",
+  "6660",
+  "1057",
+  "3108",
   "1031",
   "3066",
   "3067",
   "3076",
-  "3114",
   "3123",
   "3801",
   "3916",
+  "6690",
   "1043",
+  "3114",
+  "3144",
 ];
-const legendaryItemsId: string[] = [
-  "3089",
+const legendaries: string[] = [
   "3031",
+  "3089",
   "3072",
   "3078",
   "2501",
   "3074",
-  "3139",
+  "3083",
   "3748",
+  "6333",
   "6631",
-  "6698",
   "3157",
   "3026",
-  "3032",
+  "3033",
   "3053",
-  "3153",
-  "3508",
-  "4645",
-  "6333",
-  "6665",
-  "6676",
-  "6694",
-  "3083",
   "3100",
-  "3102",
+  "3139",
+  "3153",
+  "4645",
+  "6665",
+  "6698",
   "3156",
   "3161",
   "4633",
+  "6609",
   "6610",
   "6672",
-  "3033",
   "3036",
   "3071",
   "3073",
   "3084",
+  "3102",
   "3115",
   "3124",
   "3135",
   "3181",
   "3302",
+  "3814",
   "4629",
   "6035",
   "6653",
   "6673",
+  "6676",
+  "6694",
   "6696",
   "6697",
+  "6699",
+  "3165",
   "2504",
   "3003",
   "3004",
-  "3065",
-  "3087",
+  "3032",
+  "3508",
   "3742",
   "4646",
-  "6655",
-  "6699",
+  "6662",
+  "6692",
   "3137",
+  "6655",
   "2502",
   "2503",
   "3091",
-  "3814",
-  "4401",
-  "6609",
-  "6664",
-  "6692",
-  "3068",
-  "3075",
-  "3118",
   "3142",
+  "4401",
+  "6664",
+  "3065",
+  "3068",
+  "3087",
+  "3118",
   "3143",
   "4628",
-  "6621",
   "6701",
   "3046",
   "3085",
   "3094",
+  "6675",
+  "8020",
   "3116",
   "3152",
   "3179",
   "6657",
-  "6662",
-  "6675",
-  "3002",
   "3110",
+  "6621",
   "6695",
+  "3075",
+  "3002",
+  "3119",
   "3107",
+  "3109",
   "3222",
-  "3504",
   "4005",
   "6616",
-  "8020",
   "2065",
   "3050",
-  "3109",
-  "3165",
   "3190",
+  "3504",
   "6617",
   "6620",
   "3011",
 ];
-const allItemsId: string[] = [
-  ...basicItemsId,
-  ...epicItemsId,
-  ...legendaryItemsId,
-];
+const all: string[] = [...basics, ...epics, ...legendaries];
 
-const getAllItems = () => {
+// Deleted ids: ["4638","4643","3041","3869","3870","3871","3876","3877","3121","3172"]
+
+export const getAllItems = () => {
   const items = Object.values(database.data);
   const itemsId = Object.keys(database.data);
 
@@ -186,107 +184,88 @@ const getAllItems = () => {
   return itemsList;
 };
 
-export const getItemsByCategory = (itemCategory: ItemCategory): Item[] => {
+export const getItemsByCategory = (itemCategory: ItemCategory): ItemType[] => {
   const itemsList = getAllItems();
   let category: string[] = [];
 
   switch (itemCategory) {
     case "all":
-      category = allItemsId;
+      category = all;
       break;
     case "basics":
-      category = basicItemsId;
+      category = basics;
       break;
     case "epics":
-      category = epicItemsId;
+      category = epics;
       break;
     case "legendaries":
-      category = legendaryItemsId;
-      break;
-    default:
-      category = [];
+      category = legendaries;
       break;
   }
 
-  const items: Item[] = itemsList.filter((key) => category.includes(key.id));
+  const items: ItemType[] = itemsList.filter((key) =>
+    category.includes(key.id),
+  );
   return items;
 };
 
-export const getItemById = (id: string): Item => {
+export const getItemById = (id: string): ItemType => {
   return getItemsByCategory("all")?.find((item) => item.id == id)!!;
 };
 
-const sortedItems: string[] = [];
-const legendaryItemsIdCopy = [...legendaryItemsId];
-
-const recycleItemsSorted = (sortedId: number, list: string[]) => {
-  const removedItem = list?.splice(sortedId, 1)[0];
-
-  if (sortedItems.length >= 10) {
-    const returnedItem = sortedItems.shift();
-    legendaryItemsIdCopy.push(returnedItem!!);
-    sortedItems.push(removedItem);
-  } else {
-    sortedItems.push(removedItem);
+const recycledItemsList: string[] = [];
+const recycleItems = (sortedId: string): string[] => {
+  if (recycledItemsList.length >= 10) {
+    recycledItemsList.shift();
   }
-  console.log(sortedItems);
+  recycledItemsList.push(sortedId);
+  return recycledItemsList;
 };
 
-export const getRandomItemId = (): string => {
-  const randomId = getRandomNumber(legendaryItemsIdCopy.length);
-  const sortedId = legendaryItemsIdCopy[randomId];
-  recycleItemsSorted(randomId, legendaryItemsIdCopy);
+export const getRandomLegendaryItemId = (): string => {
+  const randomId = getRandomNumber(legendaries.length);
+  const sortedId = legendaries[randomId];
+  if (recycledItemsList.some((itemId) => itemId === sortedId)) {
+    getRandomLegendaryItemId();
+  }
+  recycleItems(sortedId);
   return sortedId;
 };
 
-export const getRandomItemByCategory = (itemCategory: ItemCategory) => {
-  if (itemCategory === "legendaries") {
-    const randomId = getRandomNumber(legendaryItemsIdCopy.length);
-    // const itemsList = getItemsByCategory(itemCategory);
-    const sortedId = legendaryItemsIdCopy[randomId];
-    // const sortedItem = itemsList?.find((item) => item.id === sortedId);
-    recycleItemsSorted(randomId, legendaryItemsIdCopy);
-    return sortedId;
-  }
-};
-
-export const getItemToStructure = (itemId: string) => {
+export const getRecipeFromItemId = (itemId: string) => {
   const { id, from } = getItemById(itemId);
-  const DEFAULT_STATUS: Status = "pending";
+  const DEFAULT_STATUS: ItemStatusType = "empty";
 
-  const object: ItemStructure = {
-    id: "0",
-    itemId: id,
-    newItemId: "",
+  const itemStructure: ItemRecipeType = {
+    id: id,
+    position: "0",
+    droppedId: "",
     status: DEFAULT_STATUS,
     from: [],
   };
   if (from != undefined && from?.length > 0) {
-    console.log("entrei", id, from);
     from?.map((f, index) => {
-      const objectChild: ItemStructure = {
-        id: (index + 1).toString(),
-        itemId: f,
+      const objectChild: ItemRecipeType = {
+        id: f,
+        position: (index + 1).toString(),
+        droppedId: "",
         status: DEFAULT_STATUS,
-        newItemId: "",
         from: [],
       };
-      const childFrom = getItemById(f).from;
+      const childFrom = getItemById(f)?.from;
       if (childFrom != undefined && childFrom.length > 0)
         childFrom.map((c, index) => {
-          const objectGrandchild: ItemStructure = {
-            id: (objectChild.id + (index + 1)).toString(),
-            itemId: c,
+          const objectGrandchild: ItemRecipeType = {
+            id: c,
+            position: (objectChild.position + (index + 1)).toString(),
+            droppedId: "",
             status: DEFAULT_STATUS,
-            newItemId: "",
           };
           objectChild.from?.push(objectGrandchild);
         });
-      object.from?.push(objectChild);
+      itemStructure.from?.push(objectChild);
     });
-    // localStorage.setItem("sortedItem", JSON.stringify(object))
-    return object;
+    return itemStructure;
   }
-  // localStorage.setItem("sortedItem", JSON.stringify(object))
-  return object;
+  return itemStructure;
 };

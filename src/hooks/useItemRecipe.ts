@@ -1,40 +1,39 @@
 import { useEffect, useState } from "react";
-import { ItemStructure } from "../types/ItemStructure";
+import { ItemRecipeType } from "../types/ItemRecipeType";
 import { getItemById } from "../utils/getItems";
-import { Status } from "../types/Status";
+import { ItemStatusType } from "../types/ItemStatusType";
 
-export function useItemStructure(itemId: string) {
-  const [itemStructure, setItemStructure] = useState<ItemStructure>();
+export function useItemRecipe(itemId: string) {
+  const [itemStructure, setItemStructure] = useState<ItemRecipeType>();
 
   useEffect(() => {
     if (getItemById(itemId) == undefined) return undefined;
     const { id, from } = getItemById(itemId);
-    const DEFAULT_STATUS: Status = "pending";
+    const DEFAULT_STATUS: ItemStatusType = "empty";
 
-    const object: ItemStructure = {
+    const object: ItemRecipeType = {
       id: "0",
-      itemId: id,
+      position: id,
       status: DEFAULT_STATUS,
-      newItemId: "",
+      droppedId: "",
       from: [],
     };
     if (from != undefined && from?.length > 0) {
-      console.log("entrei", id, from);
       from?.map((f, index) => {
-        const objectChild: ItemStructure = {
+        const objectChild: ItemRecipeType = {
           id: (index + 1).toString(),
-          itemId: f,
+          position: f,
           status: DEFAULT_STATUS,
-          newItemId: "",
+          droppedId: "",
           from: [],
         };
         const childFrom = getItemById(f).from;
         if (childFrom != undefined && childFrom.length > 0)
           childFrom.map((c, index) => {
-            const objectGrandchild: ItemStructure = {
+            const objectGrandchild: ItemRecipeType = {
               id: (objectChild.id + (index + 1)).toString(),
-              itemId: c,
-              newItemId: "",
+              position: c,
+              droppedId: "",
               status: DEFAULT_STATUS,
             };
             objectChild.from?.push(objectGrandchild);
