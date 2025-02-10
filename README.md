@@ -37,3 +37,7 @@ O **Guess The League Item** é um quiz interativo para desafiar o conhecimento d
 🔀 **dnd-kit** – Biblioteca para arrastar e soltar itens, criando uma interação mais fluida no jogo.
 
 Com o **Guess The League Item**, você pode treinar sua memória, aprender mais sobre os itens e desafiar seus amigos para ver quem realmente entende do jogo!
+
+![image](https://github.com/user-attachments/assets/7cb71ed8-8fac-4c9a-9007-aaecb1c0e2b8)
+![image](https://github.com/user-attachments/assets/e2044ad8-a859-402e-8d9e-0c1b896b996c)
+
